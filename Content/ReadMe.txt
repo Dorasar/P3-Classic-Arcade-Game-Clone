@@ -1,0 +1,63 @@
+Game setup:
+    When the game first starts, you will be presented with the character selection screen.
+  Use the Arrow keys or the A/D keys to navigate the models. Once you have chosen your
+  model hit the [Enter] key. The [Enter] key will start the game.
+
+Playing the Game:
+    When the game starts, bugs are marching across the screen. Your job, as our plucky hero,
+  is to cross the sea of bugs and get to the pond. Once you reach the pond, you find yourself
+  back in the grass.
+
+    Once you have crossed the road once, items start appearing in the road, Gems, Hearts and Keys.
+  Collect these items and you will be reward with points.
+    Blue Gem: 5 Points
+    Green Gem: 10 Points
+    Orange Gem: 20 Points
+    Heart: 30 Points
+    Key: 40 Points
+
+    To restart the game hit the [R] key. You will be asked to confirm this decision. When
+  you restart, your score will be lost, but not your high score.
+
+
+
+Keys:
+  Character Selection Screen:
+    Left or A:
+      Move the player selection one model to the left.
+    Right or D:
+      Move the player selection one model to the right.
+    Enter:
+      Start the game.
+    Number keys (1-5):
+      Select the corresponding character.
+
+Game Running:
+  Space or P:
+    Pause or Unpause the game.
+  Left or A:
+    Move the player one square to the left.
+  Right or D:
+    Move the player one square to the right.
+  Up or W:
+    Move the player one square to the up.
+  Down or S:
+    Move the player one square to the down.
+
+  Restart?:
+    Y:
+      Restart the game and take the player back to the player selection screen
+    N:
+      Unpause and go back to the game.
+
+Sources:
+  The following links are references I used to complete this project.
+
+  Udacity: Object-Oriented Javascript
+  Udacity: HTML5 Canvas
+
+  http://www.w3schools.com/jsref/jsref_random.asp
+    Used for the syntax of Math.random();
+
+  https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-globalalpha
+    Used to make the black, semi-transparant box around the text on the restart and player select screen
