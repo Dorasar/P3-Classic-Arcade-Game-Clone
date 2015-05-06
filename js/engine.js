@@ -149,11 +149,11 @@ var Engine = (function(global) {
          * the render function you have defined.
          */
          allCollectibles.forEach(function(collectible) {
-           collectible.render();
+          collectible.render();
          });
 
         allEnemies.forEach(function(enemy) {
-            enemy.render();
+          enemy.render();
         });
 
         player.render();
