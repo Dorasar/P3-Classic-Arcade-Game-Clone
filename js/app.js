@@ -435,7 +435,9 @@ Player.prototype.render = function() {
     this.renderTitleScreen();
     return;
   }
-
+  else if(gameDetails.paused === 1) {
+    this.renderPaused();
+  }
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 
   ctx.fillStyle = "White";
@@ -463,6 +465,20 @@ Player.prototype.renderConfirmRestart = function() {
   ctx.fillText("Are you sure you want to restart? ", 55, 240);
   ctx.fillText("[Y] to Restart", 88, 280);
   ctx.fillText("[N] to Continue", 88, 320);
+
+};
+
+Player.prototype.renderPaused = function() {
+
+  ctx.globalAlpha = .65;
+  ctx.fillStyle = "Black";
+  ctx.fillRect(30, 140, 445, 140);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "White";
+  ctx.font = "bold 30px Arial";
+  ctx.fillText("Paused", 200, 185);
+  ctx.font = "bold 12px Arial"
+  ctx.fillText("Press [P] or [Space] to continue...", 275, 270);
 
 };
 
