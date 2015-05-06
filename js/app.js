@@ -88,7 +88,7 @@ var Enemy = function() {
 Enemy.prototype = Object.create(Model.prototype);
 Enemy.prototype.constructor = Enemy;
 
-Enemy["replacedCount"] = 0;
+Enemy.replacedCount = 0;
 // Update the enemy's position
 // Parameters:
 //  dt: Time delta between ticks
@@ -106,13 +106,13 @@ Enemy.prototype.update = function(dt) {
   if(this.x > gameDetails.colWidth * gameDetails.numCols + gameDetails.colWidth) {
     Enemy.replacedCount--;
     this.remove();
-  };
+  }
 
   // To see what replaced does, check the Enemy constructor.
-  if(this.replaced == false && this.x > (gameDetails.colWidth * gameDetails.numCols + gameDetails.colWidth) / 2) {
+  if(this.replaced === false && this.x > (gameDetails.colWidth * gameDetails.numCols + gameDetails.colWidth) / 2) {
     Enemy.replacedCount++;
     this.replace();
-  };
+  }
 };
 
 // Once an enemy has moved off the screen we should remove it to free up it's memory.
@@ -127,8 +127,8 @@ Enemy.prototype.remove = function() {
       allEnemies.splice(key, 1);
 
       break;
-    };
-  };
+    }
+  }
 };
 
 // Lets add new enemies.
@@ -160,7 +160,7 @@ Enemy.prototype.replace = function() {
   for(var i = 0; i < newEnemyCount; i++)
   {
     allEnemies.push(new Enemy());
-  };
+  }
 };
 
 // In this bizarre world, bugs squash humans. Lets see if the bugs catch a human.
@@ -186,7 +186,7 @@ Enemy.prototype.detectCollision = function() {
     {
       // yes? Then the plucky hero is squashed.
       player.nextLevel(true);
-    };
+    }
 };
 
 /*********************************\
@@ -237,13 +237,13 @@ Player.prototype.update = function(dt){
     // Good things happen here.
     // Let's increase the score, and reset the player location for the next level.
     this.nextLevel(false);
-  };
+  }
 };
 
 // Accept the user input and move the character accordingly.
 Player.prototype.handleInput = function(val){
   // The input is not valid so there is no input to handle.
-  if(val == undefined)
+  if(val === undefined)
     return;
 
   var dx = 0,
@@ -261,12 +261,12 @@ Player.prototype.handleInput = function(val){
         }
         else {
           gameDetails.paused = 1;
-        };
+        }
         return;
       case "r": // Allow the player to restart the game.
         this.confirmRestart();
         return;
-    };
+    }
     // The details on how the player will move. Only move when the game is running
     // and the game is not paused.
     if(gameDetails.paused === 0)
@@ -293,7 +293,7 @@ Player.prototype.handleInput = function(val){
           if(this.y + this.ySpeed < ctx.canvas.height - 171)
             dy = this.ySpeed;
           break;
-      };
+      }
 
       if(dx !== 0 || dy !== 0) {  // Only move if we need to move. We might not move if the player tried to move off the screen.
         this.move(dx, dy,dt);
@@ -325,7 +325,7 @@ Player.prototype.handleInput = function(val){
           gameDetails.gameRunning = 0;
           gameDetails.confirmRestart = 0;
           break;
-      };
+      }
     }
     else
     {
@@ -340,13 +340,13 @@ Player.prototype.handleInput = function(val){
           // 1 from the spritVal and keep looping.
           for(var v in sprites)
           {
-            if(spriteVal == 0)
+            if(spriteVal === 0)
             {
               this.sprite = sprites[v];
               break;
-            };
+            }
             spriteVal--;
-          };
+          }
           // Lets start the game again.
           gameDetails.gameRunning = 1;
           gameDetails.paused = 0;
@@ -369,7 +369,7 @@ Player.prototype.handleInput = function(val){
           if(this.selector.x + this.selector.xSpeed < ctx.canvas.width)
             dx = this.selector.xSpeed;
           break;
-      };  // switch(val)
+      }  // switch(val)
       if(dx !== 0 || dy !== 0) {  // Only move if we need to move. We might not move if the player tried to move off the screen.
         this.selector.move(dx, 0,dt);
       }
@@ -383,7 +383,7 @@ Player.prototype.nextLevel = function(reset) {
   this.x = this.startingX;
 
 
-  if(reset == true)
+  if(reset === true)
   {
     // The player has been squashed. Handle the score for restarting the game.
     this.updateScore(-1 * this.score);
@@ -423,8 +423,8 @@ Player.prototype.detectCollision = function() {
         // yes? Then the plucky here is squashed.
         this.updateScore(collectible.score);
         collectible.remove();
-      };
     }
+  }
 };
 
 // There are basically 3 different game states.
@@ -465,7 +465,7 @@ Player.prototype.render = function() {
 Player.prototype.renderConfirmRestart = function() {
 
   ctx.font = "bold 25px Arial";
-  ctx.globalAlpha = .65;
+  ctx.globalAlpha = 0.65;
   ctx.fillStyle = "Black";
   ctx.fillRect(30, 200, 445, 140);
   ctx.globalAlpha = 1;
@@ -478,14 +478,14 @@ Player.prototype.renderConfirmRestart = function() {
 
 Player.prototype.renderPaused = function() {
 
-  ctx.globalAlpha = .65;
+  ctx.globalAlpha = 0.65;
   ctx.fillStyle = "Black";
   ctx.fillRect(30, 140, 445, 140);
   ctx.globalAlpha = 1;
   ctx.fillStyle = "White";
   ctx.font = "bold 30px Arial";
   ctx.fillText("Paused", 200, 185);
-  ctx.font = "bold 12px Arial"
+  ctx.font = "bold 12px Arial";
   ctx.fillText("Press [P] or [Space] to continue...", 275, 270);
 
 };
@@ -496,7 +496,7 @@ Player.prototype.renderTitleScreen = function() {
 
   // Lets write some text
   ctx.font = "bold 30px Arial";
-  ctx.globalAlpha = .65;
+  ctx.globalAlpha = 0.65;
   ctx.fillStyle = "Black";
   ctx.fillRect(30, 140, 445, 140);
   ctx.globalAlpha = 1;
@@ -523,8 +523,7 @@ Player.prototype.updateScore = function(toadd) {
   }
 };
 
-Player.prototype.confirmRestart = function()
-{
+Player.prototype.confirmRestart = function() {
   gameDetails.confirmRestart = 1;
   gameDetails.paused = 1;
   gameDetails.gameRunning = 0;
@@ -581,7 +580,7 @@ var Collectible = function(sprite) {
       if(x == allCollectibles[i].x && y == allCollectibles[i].y) {
         existing = true;
       }
-    };
+    }
   }
 
   Model.call(this,
@@ -607,8 +606,8 @@ Collectible.prototype.remove = function() {
       allCollectibles.splice(key, 1);
 
       break;
-    };
-  };
+    }
+  }
 };
 
 Collectible.generateCollectibles = function() {
