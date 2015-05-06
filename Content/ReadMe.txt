@@ -16,7 +16,7 @@ Playing the Game:
     Heart: 30 Points
     Key: 40 Points
 
-    To pause the game, hit the [P] key.
+    To pause the game, hit the [P] key or the [Space].
 
     To restart the game hit the [R] key. You will be asked to confirm this decision. When
   you restart, your score will be lost, but not your high score.
