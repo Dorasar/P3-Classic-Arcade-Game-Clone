@@ -9,6 +9,14 @@ var gameDetails = {
   "paused": 1,
   "gameRunning": 0,
   "confirmRestart": 0,
+  "showInstructions": 0,
+};
+
+var previousState = {
+  "paused": 1,
+  "gameRunning": 0,
+  "confirmRestart": 0,
+  "showInstructions": 0,
 };
 
 // A variable containing all the images used for the game.
@@ -193,7 +201,12 @@ Enemy.prototype.detectCollision = function() {
 * Player
 *   render  (overrides the Model class version)
 *   renderConfirmRestart
-*   renderTitleScreen
+*   renderTitleScreenText
+*   renderTitleScreenSprites
+*   renderInstructions
+*   drawCharacterKey
+*   drawImage
+*   drawArrowKey
 *   move    (inherited from the Model class)
 *   update
 *   handleInput
@@ -201,6 +214,8 @@ Enemy.prototype.detectCollision = function() {
 *   detectCollision
 *   updateScore
 *   confirmRestart
+*   recordCurrentState
+*   resetCurrentState
 \*********************************/
 // The heroic player. The chicken always makes it across. Maybe the player will too.
 var Player = function(sprite) {
@@ -352,6 +367,17 @@ Player.prototype.handleInput = function(val){
           gameDetails.paused = 0;
           this.selector = null;
           break;
+        case "i":
+          if(gameDetails.showInstructions === 0)
+          {
+            this.recordCurrentState();
+            gameDetails.showInstructions = 1;
+          }
+          else
+          {
+            this.resetCurrentState();
+          }
+          break;
         case "1":
         case "2":
         case "3":
@@ -375,6 +401,23 @@ Player.prototype.handleInput = function(val){
       }
     }
   }
+};
+
+Player.prototype.recordCurrentState = function()
+{
+  previousState.paused = gameDetails.paused;
+  previousState.gameRunning = gameDetails.gameRunning;
+  previousState.confirmRestart = gameDetails.confirmRestart;
+  previousState.showInstructions = gameDetails.showInstructions;
+};
+
+Player.prototype.resetCurrentState = function()
+{
+  gameDetails.paused = previousState.paused;
+  gameDetails.gameRunning = previousState.gameRunning;
+  gameDetails.confirmRestart = previousState.confirmRestart;
+  gameDetails.showInstructions = previousState.showInstructions;
+
 };
 
 Player.prototype.nextLevel = function(reset) {
@@ -432,21 +475,27 @@ Player.prototype.detectCollision = function() {
 // The game is running (Paused or unpaused)
 // The player asked to reset the game.
 Player.prototype.render = function() {
-  if(gameDetails.confirmRestart === 1) {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    this.renderConfirmRestart();
-  }
-  else if(gameDetails.gameRunning === 0) {
-    this.renderTitleScreen();
+
+  if(gameDetails.confirmRestart === 0 && gameDetails.gameRunning === 0) {
+    this.renderTitleScreenSprites();
+
+    if(gameDetails.showInstructions === 1) {
+      this.renderInstructions();
+    }
+    else {
+      this.renderTitleScreenText();
+    }
+
     return;
   }
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  if(gameDetails.confirmRestart === 1) {
+    this.renderConfirmRestart();
+  }
   else if(gameDetails.paused === 1) {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     this.renderPaused();
   }
-  else {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-  }
+
 
   ctx.fillStyle = "White";
   ctx.font = "bold 16px Arial";
@@ -490,7 +539,7 @@ Player.prototype.renderPaused = function() {
 
 };
 
-Player.prototype.renderTitleScreen = function() {
+Player.prototype.renderTitleScreenText = function() {
   var rowX = 0,
     rowY = gameDetails.rowHeight * 3 + gameDetails.rowStart;
 
@@ -504,7 +553,13 @@ Player.prototype.renderTitleScreen = function() {
   ctx.fillText("Choose a Character", 110, 185);
   ctx.font = "bold 12px Arial";
   ctx.fillText("Press [Enter] to continue...", 315, 270);
+  ctx.fillText("Press [I] for instructions...", 40, 270);
 
+};
+
+Player.prototype.renderTitleScreenSprites = function() {
+  var rowX = 0,
+    rowY = gameDetails.rowHeight * 3 + gameDetails.rowStart;
 
   // Draw all the player sprites
   ctx.drawImage(Resources.get(this.selector.sprite), this.selector.x, this.selector.y);
@@ -514,6 +569,149 @@ Player.prototype.renderTitleScreen = function() {
   ctx.drawImage(Resources.get(sprites.hornGirl), gameDetails.colWidth * 2, rowY);
   ctx.drawImage(Resources.get(sprites.pinkGirl), gameDetails.colWidth * 3, rowY);
   ctx.drawImage(Resources.get(sprites.princessGirl), gameDetails.colWidth * 4, rowY);
+};
+
+Player.prototype.renderInstructions = function() {
+
+  //Background box
+  ctx.globalAlpha = 0.65;
+  ctx.fillStyle = "Black";
+  ctx.fillRect(30, 140, 445, 315);
+  ctx.globalAlpha = 1;
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "White";
+  ctx.strokeStyle = "White";
+
+  //Game Description
+  this.drawImage(ctx, 150, 150, 100, 150, Resources.get(sprites.bug), "Your Mortal Enemy", true);
+
+  //Talk about the scoring here
+  var imgX = 350;
+  var imgY = 150;
+  var imgHeight = 25;
+  var imgWidth = 25;
+  ctx.fillText("Score", imgX + 30, imgY + 10);
+  imgY = imgY + 17;
+  this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.gemBlue), "5 Points", false);
+  imgY = imgY + imgHeight;
+  this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.gemGreen), "10 Points", false);
+  imgY = imgY + imgHeight;
+  this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.gemOrange), "20 Points", false);
+  imgY = imgY + imgHeight;
+  this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.heart), "30 Points", false);
+  imgY = imgY + imgHeight;
+  this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.key), "40 Points", false);
+
+  //All the possible keys.
+  ctx.font = "bold 15px Arial";
+
+  //Using midKey and bottomKey, I can move all of the keys around without having
+  //to change all the individual points.
+  var midKey = 60;
+  var bottomKey = 355;
+
+  //Misc Keys
+  this.drawCharacterKey(ctx, midKey, bottomKey, "P", "Pause", false);
+  bottomKey = bottomKey + 35;
+  this.drawCharacterKey(ctx, midKey, bottomKey, "R", "Restart", false);
+
+  //Movement
+  midKey = midKey + 190;
+  bottomKey = bottomKey - 55;
+  ctx.textAlign = "left";
+  ctx.fillText("Character Movement", midKey, bottomKey);
+  midKey = midKey - 8;
+
+  //Movement WASD
+  bottomKey = bottomKey + 55;
+  this.drawCharacterKey(ctx, midKey, bottomKey - 35, "W", "", false);
+  this.drawCharacterKey(ctx, midKey - 35, bottomKey, "A", "", false);
+  this.drawCharacterKey(ctx, midKey, bottomKey, "S", "", false);
+  this.drawCharacterKey(ctx, midKey + 35 * 1, bottomKey, "D", "Or", false);
+
+  //Movement Arrows
+  ctx.textAlign = "left";
+  midKey = midKey + 135;
+  this.drawArrowKey(ctx, midKey, bottomKey - 35, "W", "", false);
+  this.drawArrowKey(ctx, midKey - 35, bottomKey, "A", "", false);
+  this.drawArrowKey(ctx, midKey, bottomKey, "S", "", false);
+  this.drawArrowKey(ctx, midKey + 35, bottomKey, "D", "", false);
+  ctx.font = "bold 12px Arial";
+  ctx.fillText("Press [I] to return to character selection...", 230, 440);
+};
+
+//Draw an image on the Instructions Screen
+Player.prototype.drawImage = function(ctx, x, y, w, h, img, desc, textOnTop)
+{
+  ctx.drawImage(img, x, y, w, h);
+
+  if(textOnTop === true) {
+    ctx.textAlign = "center";
+    ctx.fillText(desc, x + w / 2, y + 15);
+  }
+  else {
+    ctx.textAlign = "left";
+    ctx.fillText(desc, x + w + 10, y + h / 2);
+  }
+
+};
+//Draw a character key on the Instructions Screen. A character key is a key with
+// a single character in it.
+Player.prototype.drawCharacterKey = function(ctx, x, y, key, desc, textOnTop) {
+  ctx.textAlign = "center";
+  ctx.strokeRect(x, y, 25, 25);
+  ctx.fillText(key, x + 25 / 2, y + 25 / 2);
+  if(textOnTop === true) {
+    ctx.fillText(desc, x + 25 / 2, y - 12);
+  }
+  else {
+    ctx.textAlign = "left";
+    ctx.fillText(desc, x + 35, y + 25 / 2);
+  }
+};
+//Draw an arrow key on the Instructions Screen. An arrow key is a key with
+// a directional arrow in it.
+Player.prototype.drawArrowKey = function(ctx, x, y, key, desc) {
+  ctx.strokeRect(x, y, 25, 25);
+
+  switch(key)
+  {
+    case "W":
+      ctx.moveTo(x + 13, y + 7);
+      ctx.lineTo(x + 13, y + 18);
+      ctx.moveTo(x + 8, y + 13);
+      ctx.lineTo(x + 13, y + 7);
+      ctx.moveTo(x + 18, y + 13);
+      ctx.lineTo(x + 13, y + 7);
+      break;
+    case "A":
+      ctx.moveTo(x + 7, y + 13);
+      ctx.lineTo(x + 18, y + 13);
+      ctx.moveTo(x + 13, y + 8);
+      ctx.lineTo(x + 7, y + 13);
+      ctx.moveTo(x + 13, y + 18);
+      ctx.lineTo(x + 7, y + 13);
+      break;
+    case "S":
+      ctx.moveTo(x + 13, y + 7);
+      ctx.lineTo(x + 13, y + 18);
+      ctx.moveTo(x + 8, y + 13);
+      ctx.lineTo(x + 13, y + 18);
+      ctx.moveTo(x + 18, y + 13);
+      ctx.lineTo(x + 13, y + 18);
+      break;
+    case "D":
+      ctx.moveTo(x + 7, y + 13);
+      ctx.lineTo(x + 18, y + 13);
+      ctx.moveTo(x + 13, y + 8);
+      ctx.lineTo(x + 18, y + 13);
+      ctx.moveTo(x + 13, y + 18);
+      ctx.lineTo(x + 18, y + 13);
+      break;
+  }
+  ctx.stroke();
+
+  ctx.fillText(desc, x + 35, y + 25 / 2);
 };
 
 Player.prototype.updateScore = function(toadd) {
@@ -647,6 +845,8 @@ document.addEventListener('keyup', function(e) {
         53: '5',      // Select the 5th model
         65: 'a',      // Move Left
         68: 'd',      // Move Right
+        73: 'i',      // Instructions
+        75: 'k',      // Keyboard shortcuts
         78: 'n',      // No (Restart)
         80: 'p',      // Pause
         82: 'r',      // Restart
