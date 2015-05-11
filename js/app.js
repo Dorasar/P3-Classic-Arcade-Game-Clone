@@ -582,6 +582,7 @@ Player.prototype.renderInstructions = function() {
   ctx.fillStyle = "White";
   ctx.strokeStyle = "White";
 
+  ctx.font = "bold 15px Arial";
   //Game Description
   this.drawImage(ctx, 150, 150, 100, 150, Resources.get(sprites.bug), "Your Mortal Enemy", true);
 
@@ -592,6 +593,7 @@ Player.prototype.renderInstructions = function() {
   var imgWidth = 25;
   ctx.fillText("Score", imgX + 30, imgY + 10);
   imgY = imgY + 17;
+  ctx.font = "bold 12px Arial";
   this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.gemBlue), "5 Points", false);
   imgY = imgY + imgHeight;
   this.drawImage(ctx, imgX, imgY, imgWidth, imgHeight, Resources.get(sprites.gemGreen), "10 Points", false);
