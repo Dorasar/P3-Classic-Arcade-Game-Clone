@@ -37,6 +37,8 @@ Character Selection Screen
 	* Move the player selection one model to the right.
 * Enter:
 	* Start the game.
+* I:
+	* Display the basic game instruction screen.
 * Number keys (1-5):
 	* Select the corresponding character.
 
