@@ -1,7 +1,7 @@
 // Keep track of all the details of the canvas so I don't have to keep typing numbers and maybe get them wrong.
 var gameDetails = {
   "numCols": 5,
-  "numRows": 6,
+  "numRows": 7,
   "colWidth": 101,
   "rowHeight": 83,
   "rowStart": 43, // There is a little bit of a gap between the bottom row and the edge of the canvas
@@ -10,6 +10,16 @@ var gameDetails = {
   "gameRunning": 0,
   "confirmRestart": 0,
   "showInstructions": 0,
+  "numStoneRows": 3,
+  "rowImages": [
+    'images/water-block.png',   // Top row is water
+    'images/stone-block.png',   // Row 1 of 3 of stone
+    'images/stone-block.png',   // Row 2 of 3 of stone
+    'images/stone-block.png',   // Row 3 of 3 of stone
+    'images/grass-block.png',   // Row 1 of 3 of grass
+    'images/grass-block.png',   // Row 2 of 3 of grass
+    'images/grass-block.png'    // Row 3 of 3 of grass
+      ],
 };
 
 var previousState = {
@@ -86,7 +96,7 @@ var Enemy = function() {
 
   Model.call(this,
       -1 * gameDetails.colWidth * Math.floor(Math.random() * 3 + 1),          // x: Start on the left for now. Start somewhere off the left side of the canvas to make it appear like the objects are created at different times.
-      Math.floor(Math.random() * 3) * gameDetails.rowHeight + gameDetails.rowStart, // y: Pick a random row stone row. There are 3 stone rows.
+      Math.floor(Math.random() * gameDetails.numStoneRows) * gameDetails.rowHeight + gameDetails.rowStart, // y: Pick a random row stone row. There are 3 or 4 stone rows.
       Math.floor(Math.random() * 110 + 40 + player.level),  // xSpeed: random speed between 50 and 150. Let's increase this based on the user level, so it gets a little bit harder.
       0,         // ySpeed: Bugs don't change lanes because they don't have blinkers.
       sprites.bug);
@@ -149,10 +159,16 @@ Enemy.prototype.replace = function() {
 
   var curCount = allEnemies.length - Enemy.replacedCount;
 
-  // I've added +1 here because we've removed an enemy from the list.
   // The replacedCount here is to tell me how many enemies have passed halfway on the screen.
   // Halfway is where I'm triggering new enemies, and since I want a maximum and minimum on the enemies, I need to keep track.
-  var maxAddition = 5 - curCount;
+  var maxAddition = 5;
+
+  //If the screen is bigger, we need more enemies I think.
+  if(gameDetails.numStoneRows === 4)
+    maxAddition = 7;
+
+  var maxAddition = maxAddition - curCount;
+
   if(maxAddition > 3)
     maxAddition = 3;
 
@@ -421,10 +437,6 @@ Player.prototype.resetCurrentState = function()
 };
 
 Player.prototype.nextLevel = function(reset) {
-  // First, lets reset the player location.
-  this.y = this.startingY;
-  this.x = this.startingX;
-
 
   if(reset === true)
   {
@@ -433,6 +445,17 @@ Player.prototype.nextLevel = function(reset) {
     allCollectibles = [];
     this.level = 1;
 
+    gameDetails.rowImages[4] = 'images/grass-block.png';
+    gameDetails.numStoneRows = 3;
+
+    for(var i = 0; i < allEnemies.length; i++)
+    {
+      if(allEnemies[i].y === (gameDetails.numStoneRows * gameDetails.rowHeight + gameDetails.rowStart))
+      {
+        allEnemies[i].remove();
+        i--;
+      }
+    }
   }
   else {
     // The player beat the level. Time to update the score.
@@ -440,7 +463,17 @@ Player.prototype.nextLevel = function(reset) {
 
     this.level++;
     Collectible.generateCollectibles();
+
+    if(this.level > 50 && gameDetails.numStoneRows === 3)
+    {
+      gameDetails.rowImages[4] = 'images/stone-block.png';
+      gameDetails.numStoneRows = 4;
+    }
   }
+
+  // Lastly, lets reset the player location.
+  this.y = gameDetails.rowHeight * (gameDetails.numRows - 3 + (gameDetails.numStoneRows - 3)) + gameDetails.rowStart;
+  this.x = this.startingX;
 };
 
 // Just like all heroes these days, our hero is crossing the road for Collectibles.
@@ -500,11 +533,11 @@ Player.prototype.render = function() {
   ctx.fillStyle = "White";
   ctx.font = "bold 16px Arial";
 
-  ctx.fillText("Score: ", 50, 575);
-  ctx.fillText( player.score, 106, 575);
+  ctx.fillText("Score: ", 50, 652);
+  ctx.fillText( player.score, 106, 652);
 
-  ctx.fillText("High Score: ", 212, 575);
-  ctx.fillText( player.highScore, 308, 575);
+  ctx.fillText("High Score: ", 212, 652);
+  ctx.fillText( player.highScore, 308, 652);
 
   ctx.font = "bold 20px Arial";
   ctx.fillText("Level: ", 40, 100);
